@@ -1,0 +1,2 @@
+# bilimcode
+Python training platform
