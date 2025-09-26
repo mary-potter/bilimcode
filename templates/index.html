@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Главная{% endblock %}
+{% block content %}
+<div class="layout">
+  <aside>
+    <ul>
+      {% for topic in topics %}
+        <li>{{ topic }}</li>
+      {% endfor %}
+    </ul>
+  </aside>
+  <section>
+    <h2>Добро пожаловать на платформу!</h2>
+    <p>Выберите тему слева, чтобы начать изучение Python.</p>
+  </section>
+</div>
+{% endblock %}

@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Python Tasks</title>
+  <style>
+    body { 
+      font-family: Arial; 
+      margin: 25px; 
+      background: url("https://i.pinimg.com/originals/1b/83/dc/1b83dce6c2a59c92d2dfdd14df85c377.gif") no-repeat center center fixed; 
+      background-size: cover;
+      color: rgb(227, 222, 222);
+      text-shadow: 1px 1px 2px #000;
+      font-size: 1.2em;
+    }
+    textarea { 
+      width: 100%; 
+      font-family: monospace; 
+      font-size: 1.25em;
+      background: #1e1e1e;   /* тёмный фон */
+      color: #e6e6e6;        /* светлый текст */
+      border: 1px solid #555;
+      border-radius: 5px;
+      padding: 8px;
+    }
+    #code { 
+      height: 400px; 
+      background: #0d0d0d;   /* ещё темнее для кода */
+      color: #00ff99;        /* зелёный текст для кода */
+    }
+    .task { 
+      border: 1px solid #ccc; 
+      padding: 15px; 
+      margin: 15px 0; 
+      background: rgba(0,0,0,0.65); 
+      border-radius: 10px;
+      font-size: 1.25em;
+    }
+    .io { 
+      display: flex; 
+      gap: 15px; 
+      margin-top: 15px; 
+    }
+    .io textarea { 
+      height: 125px; 
+      flex: 1; 
+    }
+    table { 
+      border-collapse: collapse; 
+      width: 100%; 
+      margin-top: 25px; 
+      background: rgba(255,255,255,0.08); 
+      font-size: 1.25em;
+    }
+    th, td { 
+      border: 1px solid #ccc; 
+      padding: 10px; 
+      white-space: pre-line; 
+      background-color: #0d0d0d;
+    }
+    .ok { background-color: #16741c; color: white; }
+    .fail { background-color: #e74c3c; color: white; }
+    h1 { font-size: 2.5em; color: #FFD6FF; }
+    h3 { font-size: 1.75em; color: #FFD6FF; }
+    h4 { font-size: 1.5em; color: #FFD6FF; }
+    button { 
+      padding: 12px 18px; 
+      border: none; 
+      border-radius: 6px; 
+      cursor: pointer; 
+      background: #6A0DAD; 
+      color: white; 
+      font-weight: bold;
+      font-size: 1.25em;
+      transition: background 0.3s, box-shadow 0.3s;
+    }
+    button:hover { 
+      background: #8A2BE2; 
+      box-shadow: 0 0 12px #ba68c8;
+    }
+  </style>
+</head>
+<body onload="brython()">
+  <h1>BilimCode</h1>
+
+  <div class="task">
+    <h3>Задача 1: Сложить два числа</h3>
+    <p>Напиши программу, которая читает два числа и выводит их сумму.</p>
+
+    <textarea id="code"></textarea><br>
+    <button onclick="runCode()">Запустить</button>
+    <button onclick="runAllTests()">Проверить во всех тестах</button>
+
+    <div class="io">
+      <div style="margin-right: 1%;">
+        <h4>Входные данные:</h4>
+        <textarea id="stdin"></textarea>
+      </div>
+      <div>
+        <h4>Выходные данные:</h4>
+        <textarea id="stdout" readonly></textarea>
+      </div>
+    </div>
+    
+    <!-- Таблица тестов -->
+    <h3>Тесты</h3>
+    <table id="testsTable">
+      <thead>
+        <tr>
+          <th>Вводные данные</th>
+          <th>Ожидаемый вывод</th>
+          <th>Что вывела программа</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>2
+3</td>
+          <td>5</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>10
+7</td>
+          <td>17</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>0
+0</td>
+          <td>0</td>
+          <td></td>
+        </tr>
+      </tbody>
+    </table>
+
+  </div>
+
+  <!-- Подключение Brython -->
+  <script src="https://cdn.jsdelivr.net/npm/brython@3.11.0/brython.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/brython@3.11.0/brython_stdlib.js"></script>
+
+  <script>
+    function runCode(inputData=null) {
+      const code = document.getElementById("code").value;
+      const stdin = (inputData ? inputData.split("\n") : document.getElementById("stdin").value.split("\n"));
+      let inputIndex = 0;
+
+      try {
+        __BRYTHON__.builtins.input = function() {
+          return stdin[inputIndex++] || "";
+        };
+
+        let output = "";
+        __BRYTHON__.stdout = {write: s => output += s};
+
+        if (!inputData) {
+          document.getElementById("stdout").value = "";
+        }
+
+        eval(__BRYTHON__.python_to_js(code));
+
+        if (!inputData) {
+          document.getElementById("stdout").value = output;
+        }
+
+        return output.trim();
+      } catch (e) {
+        if (!inputData) {
+          document.getElementById("stdout").value = "Ошибка: " + e;
+        }
+        return "Ошибка: " + e;
+      }
+    }
+
+    function runAllTests() {
+      let table = document.getElementById("testsTable").getElementsByTagName("tbody")[0];
+      for (let row of table.rows) {
+        let input = row.cells[0].innerText;
+        let expected = row.cells[1].innerText.trim();
+        let result = runCode(input).trim();
+        row.cells[2].innerText = result;
+
+        if (result === expected) {
+          row.cells[2].className = "ok";
+        } else {
+          row.cells[2].className = "fail";
+        }
+      }
+    }
+  </script>
+</body>
+</html>
